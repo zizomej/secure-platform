@@ -1,0 +1,42 @@
+name: Security Scan CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-scan-asterisk:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Asterisk image
+        run: docker build -t asterisk20:ci -f asterisk/Dockerfile asterisk/
+
+      - name: Scan Asterisk with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: asterisk20:ci
+          severity: CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
+
+  build-and-scan-postgres:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build PostgreSQL image
+        run: docker build -t postgres-voip:ci -f postgres/Dockerfile postgres/
+
+      - name: Scan PostgreSQL with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: postgres-voip:ci
+          severity: CRITICAL
+          exit-code: '1'
+          ignore-unfixed: true
