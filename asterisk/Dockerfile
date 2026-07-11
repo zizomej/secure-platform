@@ -28,7 +28,7 @@ WORKDIR /usr/src/asterisk-source
 
 RUN ./configure --with-jansson-bundled
 RUN make menuselect.makeopts
-RUN make -j$(nproc)
+RUN make -j1
 RUN make install && make samples && make config
 
 # ===================== ÉTAPE 2 : IMAGE FINALE =====================
