@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: asterisk
+  namespace: voip
+  labels:
+    app: asterisk
+spec:
+  clusterIP: None
+  selector:
+    app: asterisk
+  ports:
+    - name: sip-udp
+      port: 5060
+      protocol: UDP
+    - name: sip-tls
+      port: 5061
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: asterisk
+  namespace: voip
+spec:
+  serviceName: asterisk
+  replicas: 1
+  selector:
+    matchLabels:
+      app: asterisk
+  template:
+    metadata:
+      labels:
+        app: asterisk
+    spec:
+      containers:
+        - name: asterisk
+          image: azizdocker2026/asterisk20:v1
+          ports:
+            - containerPort: 5060
+              protocol: UDP
+            - containerPort: 5061
+              protocol: TCP

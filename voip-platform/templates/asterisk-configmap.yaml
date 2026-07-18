@@ -1,0 +1,61 @@
+apiVersion: v1
+data:
+  extensions.conf: |
+    [interne]
+    ; Quand on compose 1001, faire sonner le poste 1001 pendant 20s
+    exten => 1001,1,Dial(PJSIP/1001,20)
+    exten => 1001,n,Hangup()
+
+    ; Quand on compose 1002, faire sonner le poste 1002 pendant 20s
+    exten => 1002,1,Dial(PJSIP/1002,20)
+    exten => 1002,n,Hangup()
+  pjsip.conf: |
+    ;===================== TRANSPORT =====================
+    [transport-udp]
+    type=transport
+    protocol=udp
+    bind=0.0.0.0:5060
+
+    ;===================== TEMPLATE COMMUN =====================
+    [endpoint-template](!)
+    type=endpoint
+    context=interne
+    disallow=all
+    allow=ulaw
+    allow=alaw
+    direct_media=no
+
+    [auth-template](!)
+    type=auth
+    auth_type=userpass
+
+    [aor-template](!)
+    type=aor
+    max_contacts=1
+
+    ;===================== POSTE 1001 =====================
+    [1001](endpoint-template)
+    auth=1001-auth
+    aors=1001
+
+    [1001-auth](auth-template)
+    username=1001
+    password=poste1001pw
+
+    [1001](aor-template)
+
+    ;===================== POSTE 1002 =====================
+    [1002](endpoint-template)
+    auth=1002-auth
+    aors=1002
+
+    [1002-auth](auth-template)
+    username=1002
+    password=poste1002pw
+
+    [1002](aor-template)
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: asterisk-config
+  namespace: {{ .Values.namespace }}

@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: asterisk
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: asterisk
+spec:
+  clusterIP: None
+  selector:
+    app: asterisk
+  ports:
+    - name: sip-udp
+      port: 5060
+      protocol: UDP
+    - name: sip-tls
+      port: 5061
+      protocol: TCP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: asterisk
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: asterisk
+  replicas: {{ .Values.asterisk.replicas }}
+  selector:
+    matchLabels:
+      app: asterisk
+  template:
+    metadata:
+      labels:
+        app: asterisk
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: asterisk
+          image: {{ .Values.asterisk.image }}
+          imagePullPolicy: Always
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - NET_RAW
+          resources:
+            {{- toYaml .Values.asterisk.resources | nindent 12 }}
+          ports:
+            - containerPort: 5060
+              protocol: UDP
+            - containerPort: 5061
+              protocol: TCP
+          volumeMounts:
+            - name: asterisk-config
+              mountPath: /etc/asterisk/pjsip.conf
+              subPath: pjsip.conf
+            - name: asterisk-config
+              mountPath: /etc/asterisk/extensions.conf
+              subPath: extensions.conf
+          livenessProbe:
+            exec:
+              command: ["asterisk", "-rx", "core show uptime"]
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command: ["asterisk", "-rx", "core show uptime"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: asterisk-config
+          configMap:
+            name: asterisk-config

@@ -1,0 +1,27 @@
+namespace: voip
+
+asterisk:
+  image: azizdocker2026/asterisk20:v1
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+postgres:
+  image: azizdocker2026/postgres-voip:v1
+  storageSize: 2Gi
+  storageClassName: local-path
+  credentials:
+    postgresPassword: CHANGE_ME_AT_DEPLOY
+    replicationPassword: CHANGE_ME_AT_DEPLOY
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
