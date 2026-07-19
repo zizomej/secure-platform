@@ -34,14 +34,39 @@ spec:
       nodeName: worker2
       dnsPolicy: ClusterFirstWithHostNet
       automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       containers:
         - name: kamailio
           image: azizdocker2026/kamailio:v1
           imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - NET_RAW
           command: ["kamailio", "-DD", "-E", "-f", "/etc/kamailio/kamailio.cfg"]
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
           ports:
             - containerPort: 5070
               protocol: UDP
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "kill -0 1"]
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "kill -0 1"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
           volumeMounts:
             - name: kamailio-config
               mountPath: /etc/kamailio/kamailio.cfg
