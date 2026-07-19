@@ -71,7 +71,16 @@ spec:
             - name: kamailio-config
               mountPath: /etc/kamailio/kamailio.cfg
               subPath: kamailio.cfg
+            - name: kamailio-config
+              mountPath: /etc/kamailio/tls.cfg
+              subPath: tls.cfg
+            - name: tls-certs
+              mountPath: /etc/kamailio/certs
+              readOnly: true
       volumes:
         - name: kamailio-config
           configMap:
             name: kamailio-config
+        - name: tls-certs
+          secret:
+            secretName: kamailio-tls-secret
