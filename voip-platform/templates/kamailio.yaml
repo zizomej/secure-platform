@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kamailio
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: kamailio
+spec:
+  clusterIP: None
+  selector:
+    app: kamailio
+  ports:
+    - name: sip-udp
+      port: 5070
+      protocol: UDP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kamailio
+  namespace: {{ .Values.namespace }}
+spec:
+  serviceName: kamailio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kamailio
+  template:
+    metadata:
+      labels:
+        app: kamailio
+    spec:
+      hostNetwork: true
+      nodeName: worker2
+      dnsPolicy: ClusterFirstWithHostNet
+      automountServiceAccountToken: false
+      containers:
+        - name: kamailio
+          image: azizdocker2026/kamailio:v1
+          imagePullPolicy: IfNotPresent
+          command: ["kamailio", "-DD", "-E", "-f", "/etc/kamailio/kamailio.cfg"]
+          ports:
+            - containerPort: 5070
+              protocol: UDP
+          volumeMounts:
+            - name: kamailio-config
+              mountPath: /etc/kamailio/kamailio.cfg
+              subPath: kamailio.cfg
+      volumes:
+        - name: kamailio-config
+          configMap:
+            name: kamailio-config
