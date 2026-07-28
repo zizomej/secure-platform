@@ -1,0 +1,64 @@
+publicURL: "http://192.168.239.149:30000"
+enableAuth: false
+enableGuests: true
+
+web:
+  replicaCount: 1
+  service:
+    type: NodePort
+    port: 80
+    nodePort: 30000
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 300m
+      memory: 300Mi
+  nodeSelector:
+    kubernetes.io/hostname: worker1
+
+prosody:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 96Mi
+    limits:
+      cpu: 300m
+      memory: 256Mi
+  nodeSelector:
+    kubernetes.io/hostname: worker1
+
+jicofo:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 200Mi
+    limits:
+      cpu: 400m
+      memory: 384Mi
+  nodeSelector:
+    kubernetes.io/hostname: worker1
+
+jvb:
+  replicaCount: 1
+  service:
+    enabled: true
+    type: NodePort
+    nodePort: 30300
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  nodeSelector:
+    kubernetes.io/hostname: worker1
+
+etherpad:
+  enabled: false
+excalidraw:
+  enabled: false
+jibri:
+  enabled: false
