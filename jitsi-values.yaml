@@ -36,9 +36,15 @@ jicofo:
       memory: 200Mi
     limits:
       cpu: 400m
-      memory: 384Mi
+      memory: 400Mi
   nodeSelector:
     kubernetes.io/hostname: worker1
+  livenessProbe:
+    initialDelaySeconds: 90
+    failureThreshold: 5
+  readinessProbe:
+    initialDelaySeconds: 90
+    failureThreshold: 5
 
 jvb:
   replicaCount: 1
@@ -55,6 +61,12 @@ jvb:
       memory: 512Mi
   nodeSelector:
     kubernetes.io/hostname: worker1
+  livenessProbe:
+    initialDelaySeconds: 90
+    failureThreshold: 5
+  readinessProbe:
+    initialDelaySeconds: 90
+    failureThreshold: 5
 
 etherpad:
   enabled: false
