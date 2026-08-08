@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heplify-server
+  namespace: homer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heplify-server
+  template:
+    metadata:
+      labels:
+        app: heplify-server
+    spec:
+      containers:
+      - name: heplify-server
+        image: sipcapture/heplify-server:latest
+        imagePullPolicy: IfNotPresent
+        command: ["./heplify-server"]
+        args: ["-config", "/etc/heplify-server.toml"]
+        workingDir: /root
+        ports:
+        - containerPort: 9060
+          protocol: UDP
+        - containerPort: 9060
+          protocol: TCP
+        - containerPort: 9096
+          protocol: TCP
+        volumeMounts:
+        - name: config
+          mountPath: /etc/heplify-server.toml
+          subPath: heplify-server.toml
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+      volumes:
+      - name: config
+        configMap:
+          name: heplify-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: heplify-server
+  namespace: homer
+spec:
+  selector:
+    app: heplify-server
+  ports:
+  - name: hep-udp
+    port: 9060
+    targetPort: 9060
+    protocol: UDP
+  - name: hep-tcp
+    port: 9060
+    targetPort: 9060
+    protocol: TCP
+  - name: metrics
+    port: 9096
+    targetPort: 9096
+    protocol: TCP

@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-kamailio-to-homer-hep
+  namespace: voip
+spec:
+  podSelector:
+    matchLabels:
+      app: kamailio
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: homer
+    ports:
+    - protocol: UDP
+      port: 9060
+    - protocol: TCP
+      port: 9060
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53

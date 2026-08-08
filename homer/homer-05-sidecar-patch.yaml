@@ -1,0 +1,29 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: heplify-sidecar
+        image: sipcapture/heplify:1.0
+        imagePullPolicy: IfNotPresent
+        command: ["/heplify"]
+        args:
+        - "-i"
+        - "any"
+        - "-hs"
+        - "192.168.239.149:9060"
+        - "-m"
+        - "SIP"
+        - "-pr"
+        - "5070"
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+            - NET_ADMIN
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "25m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"

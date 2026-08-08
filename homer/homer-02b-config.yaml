@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heplify-config
+  namespace: homer
+data:
+  heplify-server.toml: |
+    HEPAddr = "0.0.0.0:9060"
+    HEPTCPAddr = "0.0.0.0:9060"
+    ESAddr = ""
+    LokiURL = ""
+    PromAddr = "0.0.0.0:9096"
+    DBShema = "homer7"
+    DBDriver = "postgres"
+    DBAddr = "homer-postgres:5432"
+    DBUser = "root"
+    DBPass = "homerSeven"
+    DBDataTable = "homer_data"
+    DBConfTable = "homer_config"
+    DBBulk = 200
+    DBTimer = 4
+    DBBuffer = 400000
+    DBWorker = 8
+    DBRotate = true
+    DBDropDays = 5
+    Dedup = false
+    LogLvl = "info"
+    LogStd = true

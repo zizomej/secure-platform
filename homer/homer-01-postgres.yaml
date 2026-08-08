@@ -1,0 +1,78 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homer-postgres-init
+  namespace: homer
+data:
+  init.sql: |
+    CREATE DATABASE homer_config;
+    CREATE DATABASE homer_data;
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: homer-postgres
+  namespace: homer
+spec:
+  serviceName: homer-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homer-postgres
+  template:
+    metadata:
+      labels:
+        app: homer-postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "root"
+        - name: POSTGRES_PASSWORD
+          value: "homerSeven"
+        - name: POSTGRES_DB
+          value: "postgres"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "384Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        - name: init
+          mountPath: /docker-entrypoint-initdb.d
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-U", "root"]
+          initialDelaySeconds: 15
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+      volumes:
+      - name: init
+        configMap:
+          name: homer-postgres-init
+      - name: data
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homer-postgres
+  namespace: homer
+spec:
+  selector:
+    app: homer-postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
