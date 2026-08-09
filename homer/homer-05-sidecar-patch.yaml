@@ -10,7 +10,7 @@ spec:
         - "-i"
         - "any"
         - "-hs"
-        - "192.168.239.149:9060"
+        - "heplify-server.homer.svc.cluster.local:9060"
         - "-m"
         - "SIP"
         - "-pr"
