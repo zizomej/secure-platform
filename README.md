@@ -173,8 +173,3 @@ Résultat obtenu : **Peak 214 appels simultanés**, **0/0/0 UDP errors**, ~6000 
 - Chiffrement média **SRTP**
 - Cluster **multi-zones** (haute disponibilité géographique)
 
----
-
-**Registre Docker Hub :** azizdocker2026/ · **Auteur :** Aziz Mejri (@zizomej) · **ESPRIT 2025/2026**
-READMEEOF
-echo "README remplace (sans semaines)"
